@@ -718,6 +718,21 @@ impl<'a, 'cfg> Context<'a, 'cfg> {
     }
 
     pub fn rustflags_args(&self, unit: &Unit) -> CargoResult<Vec<String>> {
+        let compiling_with_target = self.build_config.requested_target.is_some();
+        let is_target_kind = unit.kind == Kind::Target;
+
+        if compiling_with_target && ! is_target_kind {
+            // This is probably a build script or plugin and we're
+            // compiling with --target
+            if let Some(a) = env::var("RUSTFLAGS_HOST").ok() {
+                let args = a.split(" ")
+                    .map(str::trim)
+                    .filter(|s| !s.is_empty())
+                    .map(str::to_string);
+                return Ok(args.collect());
+            }
+        }
+
         env_args(self.config, &self.build_config, unit.kind, "RUSTFLAGS")
     }
 
