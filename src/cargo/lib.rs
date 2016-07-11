@@ -1,4 +1,4 @@
-#![deny(unused)]
+//#![deny(unused)]
 #![cfg_attr(test, deny(warnings))]
 
 #[cfg(test)] extern crate hamcrest;
